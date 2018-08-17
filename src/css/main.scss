@@ -1,0 +1,58 @@
+@import "mq";
+@import "fonts";
+@import "palette";
+// Uncomment for embeds
+@import "embed";
+// Uncomment for full screen (including immersive article main media)
+//@import "fullscreen";
+.element-atom,
+.interactive-atom {
+    margin: 0 !important;
+}
+
+body {
+    border-top: 1px solid #dcdcdc;
+    box-sizing: border-box;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.labels {
+    @include fs-textSans(2);
+}
+
+svg {
+    overflow: visible !important;
+}
+
+.x-axis {
+    .label {
+        @include fs-textSans(2);
+        font-weight: 300;
+        fill: #bdbdbd;
+        text-anchor: middle;
+    }
+}
+
+h2 {
+    @include fs-header(4);
+    margin-top: 3px;
+}
+
+.y-axis {
+    .label {
+        @include fs-textSans(2);
+        fill: #bdbdbd;
+    }
+}
+
+.year-label {
+    @include fs-titlepiece(3);
+}
+
+.source {
+    @include fs-textSans(2);
+    color: #bdbdbd;
+    display: block;
+    height: 24px;
+    box-sizing: border-box;
+}
