@@ -53,6 +53,7 @@ h2 {
     @include fs-textSans(2);
     color: #bdbdbd;
     display: block;
-    height: 24px;
+    //height: 24px;
+    margin-top: 3px;
     box-sizing: border-box;
 }

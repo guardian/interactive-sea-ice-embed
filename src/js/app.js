@@ -11,7 +11,7 @@ const d3 = Object.assign({}, d3Select, d3Nest, d3Shape, d3Scale, d3Array, d3Fetc
 
 window.frameElement.style.width = "100%";
 
-d3.json("https://interactive.guim.co.uk/docsdata-test/1g2VBp3nYq7LslndadMzz5JRNmQZYGvaV1-TzmD2mwX0.json").then(data => {
+d3.json("https://interactive.guim.co.uk/docsdata-test/1x5bbF71IxCztpFIAZoLe5A9HhifL0KcPQL0ZzwhBw8k.json").then(data => {
 
 
 	const width = d3.select(".interactive-wrapper").node().clientWidth;
@@ -61,24 +61,28 @@ d3.json("https://interactive.guim.co.uk/docsdata-test/1g2VBp3nYq7LslndadMzz5JRNm
 		.style("stroke-width", "1px")
 		.style("stroke", "#dcdcdc");
 
-	
-	for(let i = 0; i < 12; i++) {
+	const isMobile = window.matchMedia('(max-width: 619px)').matches
+
+	for(let i = 0; i < 13; i++) {
 		const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-		if(((width <= 450) && i % 2 == 0) || width > 450) {
+		if( true ) {
 			xAxis.append("line")
-				.attr("x1", leftMargin + i*((width-leftMargin-rightMargin)/11))
-				.attr("x2", leftMargin + i*((width-leftMargin-rightMargin)/11))
+				.attr("x1", leftMargin + i*((width-leftMargin-rightMargin)/12))
+				.attr("x2", leftMargin + i*((width-leftMargin-rightMargin)/12))
 				.attr("y1", height - 24)
 				.attr("y2", height - 24 + 5)
 				.style("stroke-width", "1px")
 				.style("stroke", "#dcdcdc");
 
+			if(i !== 12) {
+
 			xAxis.append("text")
-				.text(months[i])
-				.attr("x", leftMargin + i*((width-leftMargin-rightMargin)/11))
+				.text(isMobile ? months[i].slice(0, 1) : months[i])
+				.attr("x", leftMargin + (i+0.5)*(width-leftMargin-rightMargin)/12)
 				.attr("y", height - 6)
 				.classed("label", true);
+			}
 		}
 	}
 
