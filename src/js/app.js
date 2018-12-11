@@ -11,7 +11,7 @@ const d3 = Object.assign({}, d3Select, d3Nest, d3Shape, d3Scale, d3Array, d3Fetc
 
 window.frameElement.style.width = "100%";
 
-d3.json("https://interactive.guim.co.uk/docsdata-test/1x5bbF71IxCztpFIAZoLe5A9HhifL0KcPQL0ZzwhBw8k.json").then(data => {
+d3.json("https://interactive.guim.co.uk/interactive-sea-ice/latest.json").then(data => {
 
 
 	const width = d3.select(".interactive-wrapper").node().clientWidth;
@@ -21,6 +21,8 @@ d3.json("https://interactive.guim.co.uk/docsdata-test/1x5bbF71IxCztpFIAZoLe5A9Hh
 	const leftMargin = 30;
 	const rightMargin = 50;
 
+	const latestYear = data.slice(-1)[0].year
+
 	var x = d3.scaleLinear()
 		.domain([0, 365])
 		.range([leftMargin, width-rightMargin])
@@ -29,17 +31,21 @@ d3.json("https://interactive.guim.co.uk/docsdata-test/1x5bbF71IxCztpFIAZoLe5A9Hh
 		.domain([0, 34])
 		.range([height - bottomMargin, 0])
 
+	const latestPoint = [ x(data.slice(-1)[0].day), y (data.slice(-1)[0].vol) ]
+
+	console.log(latestPoint)
+
 	var line = d3.line()
 		.x(function(d) { return x(d.day); })
-		.y(function(d) { return y(d.Vol); });
+		.y(function(d) { return y(d.vol); });
 
 	const colour = d3.scaleLinear() 
-		.domain([1979, 1998, 2018])
+		.domain([1979, 1998, latestYear])
 		.range(["#00b2ff", "#bdbdbd", "#ff4e36"]);
 
 	const nested = d3.nest()
-		.key(f => f.Year)
-		.entries(data.sheets.Sheet1);
+		.key(f => f.year)
+		.entries(data);
 
 	const svg = d3.select(".interactive-wrapper")
 		.append("svg")
@@ -106,32 +112,16 @@ d3.json("https://interactive.guim.co.uk/docsdata-test/1x5bbF71IxCztpFIAZoLe5A9Hh
 
 	d3.select(".y-axis text:last-child").text("30 thousand km3");
 
-	// svg.append("g").selectAll("text")
-	// 	.data(nested)
-	// 	.enter()
-	// 		.append("text")
-	// 		.attr("x", leftMargin)
-	// 		.attr("y", y(11))
-	// 		.text(d => d.key)
-	// 		.style("display", "none")
-	// 		.classed("year-label", true)
-	// 		.transition()
-	// 		.delay((d, i) => i*250)
-	// 			.style("display", "block")
-	// 			.on("end", function(e) {
-	// 				d3.select(this).style("display", "none");
-	// 			});
 	const yearEl = d3.select("#year-to-change");
 
 	const defs = svg.append("defs");
 
-	defs.html(`<marker id="circle" markerWidth="8" markerHeight="8" refX="5" refY="5">
-			<circle cx="5" cy="5" r="1.5" style="stroke: none; fill:#000000;"/>
+	defs.html(`<marker id="circle" markerWidth="6" markerHeight="6" refX="3" refY="3">
+			<circle cx="3" cy="3" r="1.5" style="stroke: none; fill:#000000;"/>
 		</marker>`);
 		
 	
 	const yearLabels = ["1980", "1990", "2000", "2010"];
-
 
 	function startAnimations() {
 		svg.append("g").selectAll("path")
@@ -140,11 +130,11 @@ d3.json("https://interactive.guim.co.uk/docsdata-test/1x5bbF71IxCztpFIAZoLe5A9Hh
 			.append("path")
 			.datum(d => d.values)
 			.attr("fill", "none")
-			.attr("stroke", d => (d[0].Year == 2018) ? "#000" : colour(d[0].Year))
+			.attr("stroke", d => (d[0].year === latestYear) ? "#000" : colour(d[0].year))
 			.attr("stroke-linejoin", "round")
 			.attr("stroke-linecap", "round")
-			.attr("stroke-width", d => (d[0].Year == 2018) ? "4px" : "2px")
-			.attr("marker-end", (d) => (d[0].Year == 2018) ? "url(#circle)" : "")
+			.attr("stroke-width", d => (d[0].year === latestYear) ? "4px" : "2px")
+			.attr("marker-end", (d) => (d[0].year === latestYear) ? "url(#circle)" : "")
 			.style("fill-opacity", "1")
 			.attr("d", line)
 			.style("display", "none")
@@ -153,7 +143,7 @@ d3.json("https://interactive.guim.co.uk/docsdata-test/1x5bbF71IxCztpFIAZoLe5A9Hh
 				.style("display", "block")
 				.on("start", (d) => {
 					window.resize();
-					yearEl.text(d[0].Year)
+					yearEl.text(d[0].year)
 				});
 
 
@@ -166,7 +156,7 @@ d3.json("https://interactive.guim.co.uk/docsdata-test/1x5bbF71IxCztpFIAZoLe5A9Hh
 						.attr("y", d => {
 							const dataForYear = nested.filter(f => f.key == d)[0];
 
-							return y(dataForYear.values[0].Vol) + 10;
+							return y(dataForYear.values[0].vol) + 10;
 						})
 						.style("fill", d => colour(d))
 						.classed("labels", true)
@@ -179,30 +169,28 @@ d3.json("https://interactive.guim.co.uk/docsdata-test/1x5bbF71IxCztpFIAZoLe5A9Hh
 		setTimeout(() => {
 			const g = svg.append("g");
 			g.append("text")
-				.text("2018")
+				.text(latestYear)
 				.classed("labels", true)
 				.style("fill", "#fff")
-				.attr("x", x(212) + 12)
-				.attr("y", y(7.583) + 12)
+				.attr("x", latestPoint[0] + 12)
+				.attr("y", latestPoint[1] + 12)
 				.style("stroke", "#fff")
-				.style("stroke-width", "2px")
+				.style("stroke-width", "3px")
 				.style("font-weight", "bold");
 	
 			g.append("text")
-				.text("2018")
+				.text(latestYear)
 				.classed("labels", true)
 				.style("fill", "#000")
-				.attr("x", x(212) + 12)
-				.attr("y", y(7.583) + 12)
+				.attr("x", latestPoint[0] + 12)
+				.attr("y", latestPoint[1] + 12)
 				.style("font-weight", "bold");
 	
-		}, (2018-1979) * 250);
+		}, (latestYear-1979) * 250);
 		
 	}
 
 	let animated = false;
-
-
 
 	window.setInterval(() => {
 		if(animated == false) {
